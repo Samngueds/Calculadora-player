@@ -25,11 +25,21 @@ jobs:
     
     - name: Prepare Release
       run: |
-        mkdir release
-        mkdir release\Music
+        # Verifica se o diretório 'release' existe, se não, cria
+        if (-not (Test-Path "release")) {
+            New-Item -ItemType Directory -Path "release"
+        }
+        
+        # Verifica se o diretório 'release\Music' existe, se não, cria
+        if (-not (Test-Path "release\Music")) {
+            New-Item -ItemType Directory -Path "release\Music"
+        }
+        
+        # Copia os arquivos .exe para a pasta de release
         copy "bin\Release\net8.0\win-x86\publish\*.exe" "release\Calculadora-Plus-samns-x86.exe"
         copy "bin\Release\net8.0\win-x64\publish\*.exe" "release\Calculadora-Plus-samns-x64.exe"
         
+        # Criação do script .bat para iniciar a calculadora
         echo @echo off > release\Iniciar-Calculadora-Plus.bat
         echo if "%%PROCESSOR_ARCHITECTURE%%"=="AMD64" ( >> release\Iniciar-Calculadora-Plus.bat)
         echo     start "" "Calculadora-Plus-samns-x64.exe" >> release\Iniciar-Calculadora-Plus.bat
@@ -44,11 +54,8 @@ jobs:
         name: 🎵 Calculadora Plus by samns v${{ github.run_number }}
         body: |
           # 🎮 Calculadora Plus by samns
-
           Uma calculadora moderna com interface colorida e player de música integrado!
-
           ## ✨ Funcionalidades
-
           ### 🧮 Calculadora
           - ➕ Adição
           - ➖ Subtração
@@ -62,31 +69,26 @@ jobs:
           - 📁 Gerenciamento automático da pasta Music
           - ⏯️ Controles de reprodução
           - 📝 Lista de músicas dinâmica
-
           ## 💻 Requisitos
           - Windows 32-bit (x86) ou 64-bit (x64)
           - Arquivos MP3 para o player de música
-
           ## 📥 Instalação
           1. Baixe o arquivo "Iniciar-Calculadora-Plus.bat"
           2. Execute o arquivo baixado
           3. Para usar o player de música:
              - Adicione seus arquivos MP3 na pasta "Music"
              - Selecione a opção 6 no menu principal
-
           ## 📦 Arquivos Incluídos
           - `Calculadora-Plus-samns-x64.exe` - Versão 64-bit
           - `Calculadora-Plus-samns-x86.exe` - Versão 32-bit
           - `Iniciar-Calculadora-Plus.bat` - Inicializador automático
           - `Music/` - Pasta para seus arquivos MP3
-
           ## 🔍 Características Técnicas
           - Interface colorida usando Colorful.Console
           - Player de música usando NAudio
           - Menu interativo com ASCII art
           - Tratamento avançado de erros
           - Estrutura de código organizada
-
           ## 🆕 O que há de novo
           - Interface totalmente colorida
           - Player de música integrado
@@ -96,7 +98,6 @@ jobs:
           
           ## 👨‍💻 Desenvolvido por
           samns
-
           ## 🎯 Próximas Atualizações
           - [ ] Equalização de áudio
           - [ ] Mais operações matemáticas
