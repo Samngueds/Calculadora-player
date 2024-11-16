@@ -45,11 +45,11 @@ jobs:
           
           # Cria o script de inicialização em .bat
           echo @echo off > release\Iniciar-Calculadora-Plus.bat
-          echo if "%PROCESSOR_ARCHITECTURE%"=="AMD64" ( >> release\Iniciar-Calculadora-Plus.bat )
+          echo if "%PROCESSOR_ARCHITECTURE%"=="AMD64"  >> release\Iniciar-Calculadora-Plus.bat 
           echo     start "" "Calculadora-Plus-samns-x64.exe" >> release\Iniciar-Calculadora-Plus.bat
-          echo ) else ( >> release\Iniciar-Calculadora-Plus.bat
+          echo  else  >> release\Iniciar-Calculadora-Plus.bat
           echo     start "" "Calculadora-Plus-samns-x86.exe" >> release\Iniciar-Calculadora-Plus.bat
-          echo ) >> release\Iniciar-Calculadora-Plus.bat
+          echo  >> release\Iniciar-Calculadora-Plus.bat
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
