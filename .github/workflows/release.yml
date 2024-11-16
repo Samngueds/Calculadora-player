@@ -10,47 +10,73 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v2
-    
+    # 1. Checkout do código
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    # 2. Configuração do .NET
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 8.0.x
 
-    - name: Build
+    # 3. Build do projeto
+    - name: Build Project
       run: |
+        # Publica a versão x86 e salva em um diretório específico
         dotnet publish -c Release -r win-x86 --self-contained true /p:PublishSingleFile=true /p:PublishDir=output/win-x86/
+        # Publica a versão x64 e salva em um diretório específico
         dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:PublishDir=output/win-x64/
 
+    # 4. Depuração e verificação de saída
     - name: Debug Output
+      shell: pwsh
       run: |
-        echo "Conteúdo do diretório de build:"
+        Write-Host "Verificando conteúdo da pasta 'output':"
         Get-ChildItem -Recurse output
 
+    # 5. Preparação dos arquivos para o release
     - name: Prepare Release
+      shell: pwsh
       run: |
-        # Cria o diretório de release, se não existir
+        # Cria a pasta release, se não existir
         if (-not (Test-Path "release")) {
             New-Item -ItemType Directory -Path "release"
         }
-        
-        # Cria o diretório Music dentro de release, se não existir
+
+        # Cria a pasta Music dentro de release
         if (-not (Test-Path "release\Music")) {
             New-Item -ItemType Directory -Path "release\Music"
         }
-        
-        # Copia os executáveis para a pasta release
-        copy "output/win-x86/*.exe" "release/Calculadora-Plus-samns-x86.exe"
-        copy "output/win-x64/*.exe" "release/Calculadora-Plus-samns-x64.exe"
-        
-        # Cria o script de inicialização em .bat
-        echo @echo off > release\Iniciar-Calculadora-Plus.bat
-        echo if "%%PROCESSOR_ARCHITECTURE%%"=="AMD64" ( >> release\Iniciar-Calculadora-Plus.bat)
-        echo     start "" "Calculadora-Plus-samns-x64.exe" >> release\Iniciar-Calculadora-Plus.bat
-        echo  else ( >> release\Iniciar-Calculadora-Plus.bat)
-        echo     start "" "Calculadora-Plus-samns-x86.exe" >> release\Iniciar-Calculadora-Plus.bat
-        echo  >> release\Iniciar-Calculadora-Plus.bat
 
+        # Copia executáveis para a pasta release
+        if (Test-Path "output/win-x86") {
+            Copy-Item -Path "output/win-x86/*.exe" -Destination "release/Calculadora-Plus-samns-x86.exe"
+        } else {
+            Write-Error "Caminho output/win-x86 não encontrado."
+        }
+
+        if (Test-Path "output/win-x64") {
+            Copy-Item -Path "output/win-x64/*.exe" -Destination "release/Calculadora-Plus-samns-x64.exe"
+        } else {
+            Write-Error "Caminho output/win-x64 não encontrado."
+        }
+
+        # Adiciona a pasta Music
+        Copy-Item -Path "Music/*" -Destination "release/Music" -Recurse -ErrorAction SilentlyContinue
+
+        # Cria o script de inicialização .bat
+        $batContent = @"
+@echo off
+if "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
+    start "" "Calculadora-Plus-samns-x64.exe"
+) else (
+    start "" "Calculadora-Plus-samns-x86.exe"
+)
+"@
+        Set-Content -Path "release\Iniciar-Calculadora-Plus.bat" -Value $batContent
+
+    # 6. Criação do release no GitHub
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
