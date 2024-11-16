@@ -31,11 +31,11 @@ jobs:
         copy "bin\Release\net8.0\win-x64\publish\*.exe" "release\Calculadora-Plus-samns-x64.exe"
         
         echo @echo off > release\Iniciar-Calculadora-Plus.bat
-        echo if "%%PROCESSOR_ARCHITECTURE%%"=="AMD64" ( >> release\Iniciar-Calculadora-Plus.bat
+        echo if "%%PROCESSOR_ARCHITECTURE%%"=="AMD64" ( >> release\Iniciar-Calculadora-Plus.bat)
         echo     start "" "Calculadora-Plus-samns-x64.exe" >> release\Iniciar-Calculadora-Plus.bat
-        echo ) else ( >> release\Iniciar-Calculadora-Plus.bat
+        echo  else ( >> release\Iniciar-Calculadora-Plus.bat)
         echo     start "" "Calculadora-Plus-samns-x86.exe" >> release\Iniciar-Calculadora-Plus.bat
-        echo ) >> release\Iniciar-Calculadora-Plus.bat
+        echo  >> release\Iniciar-Calculadora-Plus.bat
     
     - name: Create Release
       uses: softprops/action-gh-release@v1
